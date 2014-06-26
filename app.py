@@ -12,7 +12,10 @@ from access_control import crossdomain
 
 EMAIL_REGEX = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}')
 # domains allowed to invoke the XMLHttpRequest API
-ALLOWED_DOMAINS = ['stationfy.com']
+#PRD
+#ALLOWED_DOMAINS = ['stationfy.com']
+#DEV
+ALLOWED_DOMAINS = ['*']
 
 app = Flask(__name__)
 
@@ -20,11 +23,13 @@ app = Flask(__name__)
 @crossdomain(origin=ALLOWED_DOMAINS)
 def signup():
     email = request.form['email']
+    user_type = request.form['user_type']
     if email and re.match(EMAIL_REGEX, email):
         signup = {
                 'email': email,
                 'ip': request.access_route[0],
                 'time': datetime.datetime.utcnow(),
+                'type' : user_type
                 }
         app.database.signups.insert(signup)
         return Response("Thanks for signing up!", status=201)
