@@ -36,6 +36,12 @@ def signup():
     else:
         return Response("Sorry, your email address is invalid.", status=400)
 
+@app.route('/healthcheck', methods=['GET'])
+@crossdomain(origin=ALLOWED_DOMAINS)
+def healthcheck():
+    count = app.database.signups.find().count()
+    return Response("MongoDB ok.", status=200)
+
 def connect_to_db():
     """Connect to database"""
     MONGOLAB_URI = os.environ['MONGOLAB_URI']
