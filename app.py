@@ -13,10 +13,10 @@ from access_control import crossdomain
 EMAIL_REGEX = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}')
 # domains allowed to invoke the XMLHttpRequest API
 ALLOWED_DOMAINS = [
-    'email-bin.intelligenttrading.org',
+    # 'email-bin.intelligenttrading.org',
     'token-sale.intelligenttrading.org',
-    'token-sale-test.intelligenttrading.org',
-    'itt-token-sale-page.s3-website-us-east-1.amazonaws.com',
+    # 'token-sale-test.intelligenttrading.org',
+    # 'itt-token-sale-page.s3-website-us-east-1.amazonaws.com',
 ]
 
 app = Flask(__name__)
