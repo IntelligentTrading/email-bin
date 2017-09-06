@@ -4,7 +4,7 @@ import os, datetime, re
 from urllib.parse import urlparse
 import logging
 logging.basicConfig()
-from pymongo import MongoClient as Connection
+from pymongo import MongoClient
 from flask import Flask, request, Response
 
 from access_control import crossdomain
@@ -33,7 +33,7 @@ def signup():
             'ip': request.access_route[0],
             'time': datetime.datetime.utcnow(),
         }
-        app.database.signups.insert(signup)
+        app.database.signups.insert_one(signup)
         return Response("Thanks for signing up!", status=201)
     else:
         return Response("Sorry, your email address is invalid.", status=400)
@@ -48,12 +48,12 @@ def healthcheck():
 def connect_to_db():
     """Connect to database"""
     MONGOLAB_URI = os.environ.get('MONGOLAB_URI')
-    MONGODB_HOST = urlparse(MONGOLAB_URI).geturl()
-    MONGODB_PORT = urlparse(MONGOLAB_URI).port
+    # MONGODB_HOST = urlparse(MONGOLAB_URI).geturl()
+    # MONGODB_PORT = urlparse(MONGOLAB_URI).port
     DATABASE_NAME = urlparse(MONGOLAB_URI).path[1:]
 
-    connection = Connection(MONGODB_HOST, MONGODB_PORT)
-    app.database = connection[DATABASE_NAME]
+    client = MongoClient(MONGOLAB_URI)
+    app.database = client[DATABASE_NAME]
 
 if __name__ == '__main__':
     connect_to_db()
