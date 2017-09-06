@@ -11,20 +11,28 @@ from access_control import crossdomain
 
 EMAIL_REGEX = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}')
 # domains allowed to invoke the XMLHttpRequest API
-ALLOWED_DOMAINS = ['token-sale.intelligenttrading.org']
+ALLOWED_DOMAINS = [
+    'token-sale.intelligenttrading.org',
+    'token-sale-test.intelligenttrading.org',
+    'itt-token-sale-page.s3-website-us-east-1.amazonaws.com',
+]
 
 app = Flask(__name__)
 
 @app.route('/signup', methods=['POST'])
 @crossdomain(origin=ALLOWED_DOMAINS)
 def signup():
-    email = request.form['email']
+    eth_amount = request.form['ethereum-amount']
+    eth_address = request.form['ethereum-address']
+    email = request.form['ethereum-email']
     if email and re.match(EMAIL_REGEX, email):
         signup = {
-                'email': email,
-                'ip': request.access_route[0],
-                'time': datetime.datetime.utcnow(),
-                }
+            'email': email,
+            'eth_amount': eth_amount,
+            'eth_address': eth_address,
+            'ip': request.access_route[0],
+            'time': datetime.datetime.utcnow(),
+        }
         app.database.signups.insert(signup)
         return Response("Thanks for signing up!", status=201)
     else:
