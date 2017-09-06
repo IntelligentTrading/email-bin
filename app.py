@@ -50,7 +50,7 @@ def healthcheck():
 
 def connect_to_db():
     """Connect to database"""
-    MONGOLAB_URI = os.environ.get('MONGOLAB_URI')
+    MONGOLAB_URI = os.environ.get('MONGODB_URI')
     # MONGODB_HOST = urlparse(MONGOLAB_URI).geturl()
     # MONGODB_PORT = urlparse(MONGOLAB_URI).port
     DATABASE_NAME = urlparse(MONGOLAB_URI).path[1:]
