@@ -1,21 +1,17 @@
 from gevent import monkey; monkey.patch_all()
 from gevent.wsgi import WSGIServer
-
-import os, datetime, urlparse, re
+import os, datetime, re
+from urllib.parse import urlparse
 import logging
 logging.basicConfig()
-
-from pymongo import Connection
+from pymongo import MongoClient as Connection
 from flask import Flask, request, Response
 
 from access_control import crossdomain
 
 EMAIL_REGEX = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}')
 # domains allowed to invoke the XMLHttpRequest API
-#PRD
-#ALLOWED_DOMAINS = ['stationfy.com']
-#DEV
-ALLOWED_DOMAINS = ['*']
+ALLOWED_DOMAINS = ['token-sale.intelligenttrading.org']
 
 app = Flask(__name__)
 
@@ -23,13 +19,11 @@ app = Flask(__name__)
 @crossdomain(origin=ALLOWED_DOMAINS)
 def signup():
     email = request.form['email']
-    user_type = request.form['user_type']
     if email and re.match(EMAIL_REGEX, email):
         signup = {
                 'email': email,
                 'ip': request.access_route[0],
                 'time': datetime.datetime.utcnow(),
-                'type' : user_type
                 }
         app.database.signups.insert(signup)
         return Response("Thanks for signing up!", status=201)
@@ -42,12 +36,13 @@ def healthcheck():
     count = app.database.signups.find().count()
     return Response("MongoDB ok.", status=200)
 
+
 def connect_to_db():
     """Connect to database"""
-    MONGOLAB_URI = os.environ['MONGOLAB_URI']
-    MONGODB_HOST = urlparse.urlparse(MONGOLAB_URI).geturl()
-    MONGODB_PORT = urlparse.urlparse(MONGOLAB_URI).port
-    DATABASE_NAME = urlparse.urlparse(MONGOLAB_URI).path[1:]
+    MONGOLAB_URI = os.environ.get('MONGOLAB_URI')
+    MONGODB_HOST = urlparse(MONGOLAB_URI).geturl()
+    MONGODB_PORT = urlparse(MONGOLAB_URI).port
+    DATABASE_NAME = urlparse(MONGOLAB_URI).path[1:]
 
     connection = Connection(MONGODB_HOST, MONGODB_PORT)
     app.database = connection[DATABASE_NAME]
